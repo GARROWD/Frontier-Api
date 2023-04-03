@@ -25,7 +25,6 @@ public class SecurityConfig {
             .requestMatchers("/api/data/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/customer/**").hasAnyRole("ADMIN", "USER")
-            .anyRequest().authenticated()
             .and()
             /* Хоть я и настроил sign-out здесь, все равно не понимаю как лучше его реализовать. Почему не в
             отдельном контроллере? */

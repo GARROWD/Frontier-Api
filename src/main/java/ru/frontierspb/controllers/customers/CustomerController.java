@@ -67,7 +67,7 @@ public class CustomerController {
         return modelMapper.map(bookingService.findByCustomer(getCustomerFromContext()), BookingResponse.class);
     }
 
-    @PutMapping("/update-username")
+    @PutMapping("/username")
     @ResponseStatus(HttpStatus.OK)
     public void updateUsername(@RequestParam String username)
             throws CustomerValidationException, CustomerAlreadyExistsException, CustomerNotFoundException {
