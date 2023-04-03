@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+<!--Это для стандартного шаблона логирования. Можно будет свой настроить, если захочется, а строчку выше удалить-->
+
+<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+        <Pattern>%d %p [%t] %C: %msg%n%throwable</Pattern>
+        <!--<Pattern>${CONSOLE_LOG_PATTERN}</Pattern>-->
+        <!--Здесь этот самый шаблон и настраивать-->
+        <!--%-30(%d %p) %-30.30([%t] %C): %msg%n%throwable-->
+    </layout>
+</appender>
+
+<appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/frontier-api.log</file>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <Pattern>%d %p [%t] %C: %msg%n%throwable</Pattern>
+        <!--А здесь для файла-->
+    </encoder>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>logs/archived/frontier-api-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>10MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+</appender>
+
+<root level="INFO">
+    <!--<appender-ref ref="File" />-->
+    <appender-ref ref="Console" />
+</root>
+
+<logger name="garrow.frontier" level="DEBUG" additivity="FALSE">
+    <!--<appender-ref ref="File" />-->
+    <appender-ref ref="Console" />
+</logger>
+
+</configuration>
