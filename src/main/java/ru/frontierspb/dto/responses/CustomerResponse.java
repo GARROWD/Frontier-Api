@@ -11,4 +11,6 @@ public class CustomerResponse {
     private String username;
 
     private String phoneNumber;
+
+    private int points;
 }
