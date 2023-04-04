@@ -15,8 +15,6 @@ import ru.frontierspb.util.exceptions.CustomerNotFoundException;
 import ru.frontierspb.util.exceptions.CustomerValidationException;
 import ru.frontierspb.util.exceptions.VerificationException;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/sign-in")
 @RequiredArgsConstructor
@@ -27,7 +25,7 @@ public class SignInController {
     @PostMapping("/send-code")
     @ResponseStatus(HttpStatus.OK)
     public void sendCode(@RequestBody SignInRequest request)
-            throws CustomerValidationException, CustomerNotFoundException, IOException, InterruptedException {
+            throws CustomerValidationException, CustomerNotFoundException {
         customerValidationService.validateSignInRequest(request);
         signInService.signIn(request.getUsername(), request.getPhoneNumber());
     }

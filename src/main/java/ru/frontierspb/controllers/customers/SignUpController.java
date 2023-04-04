@@ -13,8 +13,6 @@ import ru.frontierspb.util.exceptions.CustomerAlreadyExistsException;
 import ru.frontierspb.util.exceptions.CustomerValidationException;
 import ru.frontierspb.util.exceptions.VerificationException;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/sign-up")
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class SignUpController {
     @PostMapping("/send-code")
     @ResponseStatus(HttpStatus.OK)
     public void sendCode(@RequestBody SignUpRequest request)
-            throws CustomerValidationException, CustomerAlreadyExistsException, IOException, InterruptedException {
+            throws CustomerValidationException, CustomerAlreadyExistsException {
         customerValidationService.validateSignUpRequest(request);
         signUpService.signUp(modelMapper.map(request, Customer.class));
     }
