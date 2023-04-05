@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.List;
 
 @Getter
 @Setter
@@ -20,20 +19,22 @@ public class Customer {
     @Column(name = "username", unique = true)
     private String username;
 
+    @Column(name = "password", unique = true)
+    private String password;
+
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
-
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    List<Session> sessions;
 
     @Column(name = "points")
     private int points; //francs
 
+    /*
     @OneToMany(mappedBy = "referral", fetch = FetchType.LAZY)
-    List<Referent> referrers;
+    private List<Referent> referrers;
 
     @OneToMany(mappedBy = "referrer", fetch = FetchType.LAZY)
-    List<Referent> referrals;
+    private List<Referent> referrals;
+    */
 
     @Column(name = "role")
     private String role;
@@ -44,5 +45,9 @@ public class Customer {
 
     public void deductPoints(int points){
         this.points -= points;
+    }
+
+    public Customer(long id){
+        this.id = id;
     }
 }

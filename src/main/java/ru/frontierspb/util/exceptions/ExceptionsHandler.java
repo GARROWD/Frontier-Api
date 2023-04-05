@@ -27,9 +27,9 @@ public class ExceptionsHandler {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(AdminException.class)
-    public ResponseEntity<Map<String, String>> adminException(
-            AdminException exception) {
+    @ExceptionHandler(AdminAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> adminAlreadyExistsException(
+            AdminAlreadyExistsException exception) {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 
@@ -45,8 +45,8 @@ public class ExceptionsHandler {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(VerificationException.class)
-    public ResponseEntity<Map<String, String>> customerVerifyCodeException(VerificationException exception) {
+    @ExceptionHandler(PreviousPasswordsException.class)
+    public ResponseEntity<Map<String, String>> previousPasswordsException(PreviousPasswordsException exception) {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 

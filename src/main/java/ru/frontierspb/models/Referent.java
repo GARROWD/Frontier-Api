@@ -1,5 +1,6 @@
 package ru.frontierspb.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,10 +20,12 @@ public class Referent {
     @Column(name = "id")
     private long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referrer_id", nullable = false)
     private Customer referrer;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referral_id", nullable = false)
     private Customer referral;

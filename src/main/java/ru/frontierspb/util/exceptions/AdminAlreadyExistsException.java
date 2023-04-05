@@ -2,9 +2,9 @@ package ru.frontierspb.util.exceptions;
 
 import java.util.Map;
 
-public class VerificationException
+public class AdminAlreadyExistsException
         extends GenericException {
-    public VerificationException(Map<String, String> messages) {
+    public AdminAlreadyExistsException(Map<String, String> messages) {
         super(messages);
     }
 }

@@ -16,6 +16,7 @@ import ru.frontierspb.dto.responses.PointsResponse;
 import ru.frontierspb.dto.responses.SessionResponse;
 import ru.frontierspb.models.Booking;
 import ru.frontierspb.models.Customer;
+import ru.frontierspb.models.Referent;
 import ru.frontierspb.services.*;
 import ru.frontierspb.services.validators.CustomerValidationService;
 import ru.frontierspb.util.exceptions.*;
@@ -32,30 +33,46 @@ public class CustomerController {
     private final BookingService bookingService;
     private final CustomerService customerService;
     private final ReferentService referentService;
+    private final PreviousPasswordsService previousPasswordsService;
     private final CustomerValidationService customerValidationService;
 
     @GetMapping("/info")
     @ResponseStatus(HttpStatus.OK)
-    public CustomerResponse getInfo() {
-        return modelMapper.map(getCustomerFromContext(), CustomerResponse.class);
+    public CustomerResponse getInfo()
+            throws CustomerNotFoundException {
+        return modelMapper.map(customerService.findById(getCustomerFromContext().getId()), CustomerResponse.class);
     }
 
     @GetMapping("/sessions")
     @ResponseStatus(HttpStatus.OK)
     public List<SessionResponse> getSessions(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size)
-            throws CustomerNotFoundException {
+            @RequestParam(name = "size", defaultValue = "20") int size) {
         return sessionService.findByCustomer(getCustomerFromContext(), PageRequest.of(page, size)).stream().map(
                 session -> modelMapper.map(session, SessionResponse.class)).toList();
+    }
+
+    @GetMapping("/referrals")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Referent> getReferrals(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size) {
+        return referentService.findReferralsByReferrer(getCustomerFromContext(), PageRequest.of(page, size));
+    }
+
+    @GetMapping("/referrers")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Referent> getReferrers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size) {
+        return referentService.findReferrersByReferral(getCustomerFromContext(), PageRequest.of(page, size));
     }
 
     @GetMapping("/points-history")
     @ResponseStatus(HttpStatus.OK)
     public List<PointsResponse> getPointsHistory(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int size)
-            throws CustomerNotFoundException {
+            @RequestParam(name = "size", defaultValue = "20") int size) {
         return pointsService.findByCustomer(getCustomerFromContext(), PageRequest.of(page, size)).stream().map(
                 points -> modelMapper.map(points, PointsResponse.class)).toList();
     }
@@ -71,12 +88,23 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public void updateUsername(@RequestParam String username)
             throws CustomerValidationException, CustomerAlreadyExistsException, CustomerNotFoundException {
-        /*
-        Customer customer = getCustomerFromContext();
+        Customer customer = customerService.findById(getCustomerFromContext().getId());
         customer.setUsername(username);
         customerValidationService.validateCustomer(customer);
+        customerService.checkUniqueToUpdate(customer);
         customerService.update(customer);
-        */
+    }
+
+    @PutMapping("/password")
+    @ResponseStatus(HttpStatus.OK)
+    public void updatePassword(@RequestParam String password)
+            throws CustomerValidationException, CustomerNotFoundException,
+            PreviousPasswordsException {
+        Customer customer = customerService.findById(getCustomerFromContext().getId());
+        previousPasswordsService.checkUniqueToUpdate(customer, password);
+        customer.setPassword(password);
+        customerValidationService.validateCustomer(customer);
+        customerService.update(customer);
     }
 
     @PutMapping("/assign-referrer")

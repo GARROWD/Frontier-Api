@@ -10,7 +10,7 @@ import ru.frontierspb.dto.responses.CustomerResponse;
 import ru.frontierspb.services.AdminService;
 import ru.frontierspb.services.BookingService;
 import ru.frontierspb.services.CustomerService;
-import ru.frontierspb.util.exceptions.AdminException;
+import ru.frontierspb.util.exceptions.AdminAlreadyExistsException;
 import ru.frontierspb.util.exceptions.BookingNotFoundException;
 import ru.frontierspb.util.exceptions.CustomerNotFoundException;
 
@@ -56,7 +56,7 @@ public class AdminController {
     @PutMapping("/assign/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void assignAdmin(@PathVariable("id") long id)
-            throws CustomerNotFoundException, AdminException {
+            throws CustomerNotFoundException, AdminAlreadyExistsException {
         adminService.assignAdmin(id);
     }
 }

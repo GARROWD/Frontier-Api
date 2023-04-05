@@ -64,9 +64,9 @@ public class CustomerService {
         return foundCustomer.get();
     }
 
-    public Customer findByUsernameAndPhoneNumber(String username, String phoneNumber)
+    public Customer findByUsernameAndPassword(String username, String password)
             throws CustomerNotFoundException {
-        Optional<Customer> foundCustomer = customersRepository.findByUsernameAndPhoneNumber(username, phoneNumber);
+        Optional<Customer> foundCustomer = customersRepository.findByUsernameAndPassword(username, password);
 
         if(foundCustomer.isEmpty()) {
             throw new CustomerNotFoundException();
@@ -79,7 +79,7 @@ public class CustomerService {
         return customersRepository.findAll(pageable).toList();
     }
 
-    public List<Customer> findAllByPhoneNumberEndingWith(String phoneNumber, Pageable pageable){
+    public List<Customer> findAllByPhoneNumberEndingWith(String phoneNumber, Pageable pageable) {
         return customersRepository.findAllByPhoneNumberEndingWith(phoneNumber, pageable);
     }
 
@@ -126,10 +126,10 @@ public class CustomerService {
 
     @Transactional
     public void update(Customer customer)
-            throws CustomerAlreadyExistsException, CustomerNotFoundException {
-        existsById(customer.getId());
-        checkUniqueToUpdate(customer);
+            throws CustomerNotFoundException {
+        // existsById(customer.getId()); Надо ли?
         customersRepository.save(customer);
+        log.info("User with ID {} is updated", customer.getId());
     }
 
     @Transactional
@@ -147,7 +147,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void accruePoints(Customer customer, int points){
+    public void accruePoints(Customer customer, int points) {
         customer.accruePoints(points);
         updateWithoutChecks(customer);
     }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.frontierspb.dto.requests.SignInRequest;
 import ru.frontierspb.dto.requests.SignUpRequest;
-import ru.frontierspb.dto.requests.VerificationRequest;
 import ru.frontierspb.models.Customer;
 import ru.frontierspb.util.exceptions.CustomerValidationException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
@@ -34,6 +33,10 @@ public class CustomerValidationService {
             errors.put("message.phoneNumber.invalid", ExceptionsMessages.getMessage("message.phoneNumber.invalid"));
         }
 
+        if(passwordIsInvalid(customer.getPassword())) {
+            errors.put("message.password.invalid", ExceptionsMessages.getMessage("message.password.invalid"));
+        }
+
         if(! errors.isEmpty()) {
             throw new CustomerValidationException(errors);
         }
@@ -59,12 +62,15 @@ public class CustomerValidationService {
             errors.put("message.phoneNumber.invalid", ExceptionsMessages.getMessage("message.phoneNumber.invalid"));
         }
 
+        if(passwordIsInvalid(signUpRequest.getPassword())) {
+            errors.put("message.password.invalid", ExceptionsMessages.getMessage("message.password.invalid"));
+        }
+
         if(! errors.isEmpty()) {
             throw new CustomerValidationException(errors);
         }
 
-        signUpRequest.setPhoneNumber(
-                signUpRequest.getPhoneNumber().replaceFirst("\\+7", "8"));
+        signUpRequest.setPhoneNumber(signUpRequest.getPhoneNumber().replaceFirst("\\+7", "8"));
     }
 
     public void validateSignInRequest(SignInRequest signInRequest)
@@ -80,28 +86,8 @@ public class CustomerValidationService {
             errors.put("message.username.invalid", ExceptionsMessages.getMessage("message.username.invalid"));
         }
 
-        if(phoneNumberIsInvalid(signInRequest.getPhoneNumber())) {
-            errors.put("message.phoneNumber.invalid", ExceptionsMessages.getMessage("message.phoneNumber.invalid"));
-        }
-
-        if(! errors.isEmpty()) {
-            throw new CustomerValidationException(errors);
-        }
-    }
-
-    public void validateVerificationRequest(VerificationRequest verificationRequest)
-            throws CustomerValidationException {
-        Map<String, String> errors = new HashMap<>();
-
-        if(verificationRequestFieldsIsNull(verificationRequest)) {
-            errors.put("message.verificationRequest.nullFields",
-                       ExceptionsMessages.getMessage("message.verificationRequest.nullFields"));
-            throw new CustomerValidationException(errors);
-        }
-
-        if(codeIsInvalid(verificationRequest.getCode())) {
-            errors.put("message.verificationCode.invalid",
-                       ExceptionsMessages.getMessage("message.verificationCode.invalid"));
+        if(passwordIsInvalid(signInRequest.getPassword())) {
+            errors.put("message.password.invalid", ExceptionsMessages.getMessage("message.password.invalid"));
         }
 
         if(! errors.isEmpty()) {
@@ -117,9 +103,8 @@ public class CustomerValidationService {
         return ! Pattern.compile("^(\\+7|8)[0-9]{10}$").matcher(phoneNumber).find();
     }
 
-    private boolean codeIsInvalid(String code) {
-        // TODO Определиться с размером кода
-        return ! Pattern.compile("^[0-9]{2,10}$").matcher(code).find();
+    private boolean passwordIsInvalid(String password) {
+        return false;// TODO! Pattern.compile("").matcher(password).find();
     }
 
     private boolean customerFieldsIsNull(Customer customer) {
@@ -163,19 +148,7 @@ public class CustomerValidationService {
             return true;
         }
 
-        if(Optional.ofNullable(signInRequest.getPhoneNumber()).isEmpty()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean verificationRequestFieldsIsNull(VerificationRequest verificationRequest) {
-        if(Optional.ofNullable(verificationRequest).isEmpty()) {
-            return true;
-        }
-
-        if(Optional.ofNullable(verificationRequest.getCode()).isEmpty()) {
+        if(Optional.ofNullable(signInRequest.getPassword()).isEmpty()) {
             return true;
         }
 

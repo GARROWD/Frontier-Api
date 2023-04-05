@@ -2,6 +2,7 @@ package ru.frontierspb.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.frontierspb.models.Customer;
@@ -31,6 +32,21 @@ public class ReferentService {
         referentRepository.save(referrers);
     }
 
+    public List<Referent> findReferralsByReferrer(Customer customer, Pageable pageable) {
+        return referentRepository.findAllByReferrerOrderByLevel(customer, pageable).toList();
+    }
+    public List<Referent> findReferrersByReferral(Customer customer, Pageable pageable) {
+        return referentRepository.findAllByReferralOrderByLevel(customer, pageable).toList();
+    }
+
+    public List<Referent> findReferralsByReferrer(Customer customer) {
+        return referentRepository.findAllByReferrerOrderByLevel(customer);
+    }
+
+    public List<Referent> findReferrersByReferral(Customer customer) {
+        return referentRepository.findAllByReferralOrderByLevel(customer);
+    }
+
     @Transactional
     public void assignReferrerById(Customer customer, String referrerUsername)
             throws CustomerNotFoundException, CustomerReferentException {
@@ -39,7 +55,7 @@ public class ReferentService {
         Customer referral = customerService.findById(customer.getId());
         Customer referrer = customerService.findByUsername(referrerUsername);
 
-        if(! referral.getReferrers().isEmpty()) {
+        if(! findReferrersByReferral(referral).isEmpty()) {
             errors.put("message.customer.alreadyHaveReferrer",
                        ExceptionsMessages.getMessage("message.customer.alreadyHaveReferrer"));
         }
@@ -53,7 +69,7 @@ public class ReferentService {
             throw new CustomerReferentException(errors);
         }
 
-        if(referral.getReferrals().stream().anyMatch(
+        if(findReferralsByReferrer(referral).stream().anyMatch(
                 referent -> Objects.equals(referent.getReferral().getId(), referrer.getId()))) {
             errors.put("message.customer.referredReferral",
                        ExceptionsMessages.getMessage("message.customer.referredReferral"));
@@ -62,7 +78,7 @@ public class ReferentService {
 
         List<Referent> newReferrers =
                 Stream.concat(Stream.of(new Referent(0, referrer, referral, LEVEL_ONE)),
-                              referrer.getReferrers().stream().map(referent -> {
+                              findReferrersByReferral(referrer).stream().map(referent -> {
                                   Referent newReferent = new Referent();
                                   newReferent.setReferrer(referent.getReferrer());
                                   newReferent.setReferral(referral);

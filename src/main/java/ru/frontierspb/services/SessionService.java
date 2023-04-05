@@ -42,9 +42,7 @@ public class SessionService {
         return sessionsRepository.countAllByOutDateIsNull();
     }
 
-    public List<Session> findByCustomer(Customer customer, Pageable pageable)
-            throws CustomerNotFoundException {
-        customerService.existsById(customer.getId());
+    public List<Session> findByCustomer(Customer customer, Pageable pageable) {
         return sessionsRepository.findAllByCustomerOrderByInDateDesc(customer, pageable).toList();
     }
 

@@ -3,10 +3,10 @@ package ru.frontierspb.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.frontierspb.models.Customer;
 import ru.frontierspb.util.exceptions.CustomerNotFoundException;
-import ru.frontierspb.util.exceptions.VerificationException;
 
 import java.util.Collections;
 
@@ -14,20 +14,11 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SignInService {
     private final CustomerService customerService;
-    private final CustomerVerificationService customerVerificationService;
+    private final PasswordEncoder passwordEncoder;
 
-    public void signIn(String username, String phoneNumber)
+    public UsernamePasswordAuthenticationToken getAuthenticationToken(String username, String password)
             throws CustomerNotFoundException {
-        Customer customer = customerService.findByUsernameAndPhoneNumber(username, phoneNumber);
-
-        customerVerificationService.sendCode(customer);
-    }
-
-    public UsernamePasswordAuthenticationToken verifyAndGetAuthenticationToken(String code)
-            throws VerificationException, CustomerNotFoundException {
-        customerVerificationService.verifyCode(code);
-
-        Customer customer = customerVerificationService.getCustomerAndDeleteCache(code);
+        Customer customer = customerService.findByUsernameAndPassword(username, passwordEncoder.encode(password));
 
         return new UsernamePasswordAuthenticationToken(
                 customerService.findByUsername(customer.getUsername()), null,

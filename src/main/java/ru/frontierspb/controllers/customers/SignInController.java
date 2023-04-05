@@ -8,12 +8,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.frontierspb.dto.requests.SignInRequest;
-import ru.frontierspb.dto.requests.VerificationRequest;
 import ru.frontierspb.services.SignInService;
 import ru.frontierspb.services.validators.CustomerValidationService;
 import ru.frontierspb.util.exceptions.CustomerNotFoundException;
 import ru.frontierspb.util.exceptions.CustomerValidationException;
-import ru.frontierspb.util.exceptions.VerificationException;
 
 @RestController
 @RequestMapping("/api/sign-in")
@@ -22,27 +20,12 @@ public class SignInController {
     private final SignInService signInService;
     private final CustomerValidationService customerValidationService;
 
-    @PostMapping("/send-code")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public void sendCode(@RequestBody SignInRequest request)
+    public void signIn(@RequestBody SignInRequest request, HttpSession session)
             throws CustomerValidationException, CustomerNotFoundException {
         customerValidationService.validateSignInRequest(request);
-        signInService.signIn(request.getUsername(), request.getPhoneNumber());
-    }
-
-    @PostMapping("/verify-code")
-    @ResponseStatus(HttpStatus.OK)
-    public void verifyCode(@RequestBody VerificationRequest request, HttpSession session)
-            throws VerificationException, CustomerValidationException, CustomerNotFoundException {
-        customerValidationService.validateVerificationRequest(request);
-        UsernamePasswordAuthenticationToken token =
-                signInService.verifyAndGetAuthenticationToken(request.getCode());
-
-        /* Сорян, придется это делать здесь. Вообще в принципе процесс собственноручной аутентификация ооочень
-        сложный. Я очень надеюсь, что это не прям говно код говно кодов, ибо изучение всего этого
-        дерьма при выходе новой Spring Security 6 было невыносимым. Короче грежу мечтами, что я узнаю как это
-        правильно реализовывается и сделаю по красоте */
-
+        UsernamePasswordAuthenticationToken token = signInService.getAuthenticationToken(request.getUsername(), request.getPassword());
         SecurityContext securityContext = SecurityContextHolder.getContextHolderStrategy().getContext();
         securityContext.setAuthentication(token);
         session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);

@@ -24,12 +24,11 @@ import java.util.Objects;
 @Slf4j
 public class PointsService {
     private final OptionService optionService;
+    private final ReferentService referentService;
     private final CustomerService customerService;
     private final PointsRepository pointsRepository;
 
-    public List<Points> findByCustomer(Customer customer, Pageable pageable)
-            throws CustomerNotFoundException {
-        customerService.existsById(customer.getId());
+    public List<Points> findByCustomer(Customer customer, Pageable pageable) {
         return pointsRepository.findAllByCustomer(customer, pageable);
     }
 
@@ -40,7 +39,7 @@ public class PointsService {
 
     @Transactional
     public void accrueToReferrers(Customer customer, float price) {
-        List<Referent> referrers = customer.getReferrers();
+        List<Referent> referrers = referentService.findReferrersByReferral(customer);
         for(Referent referrer : referrers) {
             try {
                 accrueIfPresent(referrer.getReferrer().getId(), price, referrer.getLevel());
