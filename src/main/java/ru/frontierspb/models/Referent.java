@@ -1,6 +1,5 @@
 package ru.frontierspb.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,20 +16,20 @@ import ru.frontierspb.util.enums.ReferentLevel;
 public class Referent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private long id;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "referrer_id", nullable = false)
     private Customer referrer;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "referral_id", nullable = false)
     private Customer referral;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "level")
+    @Column(name = "level", nullable = false)
     private ReferentLevel level;
+
 }

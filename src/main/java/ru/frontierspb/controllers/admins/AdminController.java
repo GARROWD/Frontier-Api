@@ -49,8 +49,8 @@ public class AdminController {
     @GetMapping("/booking-status")
     @ResponseStatus(HttpStatus.OK)
     public BookingResponse bookingStatus(@RequestParam long id)
-            throws CustomerNotFoundException, BookingNotFoundException {
-        return modelMapper.map(bookingService.findByCustomer(customerService.findById(id)), BookingResponse.class);
+            throws BookingNotFoundException {
+        return modelMapper.map(bookingService.findByCustomerId(id), BookingResponse.class);
     }
 
     @PutMapping("/assign/{id}")

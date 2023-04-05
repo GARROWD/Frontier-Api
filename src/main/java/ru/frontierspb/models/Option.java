@@ -12,9 +12,9 @@ import lombok.Setter;
 @Table(name = "options")
 public class Option {
     @Id
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "value")
+    @Column(name = "value", nullable = false)
     private float value;
 }

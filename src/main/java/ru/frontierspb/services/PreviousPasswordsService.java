@@ -23,12 +23,12 @@ import java.util.Map;
 public class PreviousPasswordsService {
     private final PreviousPasswordsRepository previousPasswordsRepository;
 
-    public List<PreviousPassword> findByCustomer(Customer customer, Pageable pageable) {
-        return previousPasswordsRepository.findAllByCustomer(customer, pageable).toList();
+    public List<PreviousPassword> findByCustomer(long customerId, Pageable pageable) {
+        return previousPasswordsRepository.findAllByCustomerId(customerId, pageable).toList();
     }
 
-    public List<PreviousPassword> findByCustomer(Customer customer) {
-        return previousPasswordsRepository.findAllByCustomer(customer);
+    public List<PreviousPassword> findByCustomer(long customerId) {
+        return previousPasswordsRepository.findAllByCustomerId(customerId);
     }
 
     @Transactional
@@ -41,7 +41,7 @@ public class PreviousPasswordsService {
             throw new PreviousPasswordsException(errors);
         }
 
-        List<PreviousPassword> previousPasswords = findByCustomer(customer);
+        List<PreviousPassword> previousPasswords = findByCustomer(customer.getId());
 
         if(previousPasswords.stream().anyMatch(
                 previousPassword -> previousPassword.getPassword().equals(password))) {
@@ -56,10 +56,10 @@ public class PreviousPasswordsService {
     public void create(Customer customer) {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
         previousPasswordsRepository.deleteAll(
-                previousPasswordsRepository.findAllByCustomer(customer).stream().filter(
+                previousPasswordsRepository.findAllByCustomerId(customer.getId()).stream().filter(
                         previousPassword -> previousPassword.getDate().isBefore(sixMonthsAgo)).toList());
 
         previousPasswordsRepository.save(
-                new PreviousPassword(0, customer, LocalDateTime.now(), customer.getPassword()));
+                new PreviousPassword(0, customer.getId(), LocalDateTime.now(), customer.getPassword()));
     }
 }

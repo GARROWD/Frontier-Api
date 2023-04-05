@@ -2,19 +2,14 @@ package ru.frontierspb;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import ru.frontierspb.dto.responses.BookingResponse;
-import ru.frontierspb.dto.responses.CustomerSessionResponse;
-import ru.frontierspb.models.Booking;
-import ru.frontierspb.models.Customer;
-import ru.frontierspb.models.Session;
-
-import java.util.Optional;
+import ru.frontierspb.dto.responses.ReferralResponse;
+import ru.frontierspb.dto.responses.ReferrerResponse;
+import ru.frontierspb.models.Referent;
 
 @SpringBootApplication
 @OpenAPIDefinition
@@ -30,17 +25,13 @@ public class FrontierApplication {
         org.modelmapper.ModelMapper modelMapper = new org.modelmapper.ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         log.info("Model Mapper created");
-        /* TODO Эта огромная настройка вместо дефолтной позволяет даункастить customer до customerId, и еще
-            надо бы нормальное логирование уже завести */
-        modelMapper.createTypeMap(Session.class, CustomerSessionResponse.class)
-                   .addMappings(mapper -> mapper.using(
-                           new AbstractConverter<Customer, Long>() {
-                               @Override
-                               protected Long convert(Customer customer) {
-                                   return Optional.ofNullable(customer).map(Customer::getId).orElse(0L);
-                               }
-                           }).map(Session::getCustomer, CustomerSessionResponse::setCustomerId));
+        // TODO Эта огромная настройка вместо дефолтной позволяет даункастить чет там куда-то там
+        modelMapper.createTypeMap(Referent.class, ReferralResponse.class).addMappings(
+                mapper -> mapper.map(src -> src.getReferral().getUsername(), ReferralResponse::setUsername));
+        modelMapper.createTypeMap(Referent.class, ReferrerResponse.class).addMappings(
+                mapper -> mapper.map(src -> src.getReferrer().getUsername(), ReferrerResponse::setUsername));
 
+        /*
         modelMapper.createTypeMap(Booking.class, BookingResponse.class)
                    .addMappings(mapper -> mapper.using(
                            new AbstractConverter<Customer, Long>() {
@@ -49,6 +40,7 @@ public class FrontierApplication {
                                    return Optional.ofNullable(customer).map(Customer::getId).orElse(0L);
                                }
                            }).map(Booking::getCustomer, BookingResponse::setCustomerId));
+        */
 
         return modelMapper;
     }

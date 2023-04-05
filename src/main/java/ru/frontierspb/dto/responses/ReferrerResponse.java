@@ -6,9 +6,8 @@ import ru.frontierspb.util.enums.ReferentLevel;
 
 @Data
 @NoArgsConstructor
-public class ReferralResponse {
+public class ReferrerResponse {
     private String username;
 
     private ReferentLevel level;
 }
-

@@ -125,8 +125,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void update(Customer customer)
-            throws CustomerNotFoundException {
+    public void update(Customer customer) {
         // existsById(customer.getId()); Надо ли?
         customersRepository.save(customer);
         log.info("User with ID {} is updated", customer.getId());

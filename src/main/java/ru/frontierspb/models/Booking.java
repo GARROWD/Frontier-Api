@@ -18,14 +18,13 @@ import java.time.LocalDateTime;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @Column(name = "customer_id", nullable = false)
+    private long customerId;
 
-    @Column(name = "room_id")
+    @Column(name = "room_id", nullable = false)
     private long roomId;
 
     @Column(name = "request_date")

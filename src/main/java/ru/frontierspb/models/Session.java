@@ -14,14 +14,13 @@ import java.time.LocalDateTime;
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @Column(name = "customer_id")
+    private long customerId;
 
-    @Column(name = "customer_username")
+    @Column(name = "customer_username", nullable = false)
     private String customerUsername;
 
     @Column(name = "in_date")

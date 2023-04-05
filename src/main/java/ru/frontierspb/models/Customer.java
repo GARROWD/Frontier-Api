@@ -13,19 +13,19 @@ import lombok.Setter;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private long id;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password", unique = true)
+    @Column(name = "password", unique = true, nullable = false)
     private String password;
 
-    @Column(name = "phone_number", unique = true)
+    @Column(name = "phone_number", unique = true, nullable = false)
     private String phoneNumber;
 
-    @Column(name = "points")
+    @Column(name = "points", nullable = false)
     private int points; //francs
 
     /*
@@ -36,7 +36,7 @@ public class Customer {
     private List<Referent> referrals;
     */
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private String role;
 
     public void accruePoints(int points){
@@ -45,9 +45,5 @@ public class Customer {
 
     public void deductPoints(int points){
         this.points -= points;
-    }
-
-    public Customer(long id){
-        this.id = id;
     }
 }

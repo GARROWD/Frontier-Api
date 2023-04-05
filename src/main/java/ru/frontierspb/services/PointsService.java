@@ -28,8 +28,8 @@ public class PointsService {
     private final CustomerService customerService;
     private final PointsRepository pointsRepository;
 
-    public List<Points> findByCustomer(Customer customer, Pageable pageable) {
-        return pointsRepository.findAllByCustomer(customer, pageable);
+    public List<Points> findByCustomer(long customerId, Pageable pageable) {
+        return pointsRepository.findAllByCustomerId(customerId, pageable);
     }
 
     @Transactional
@@ -38,8 +38,8 @@ public class PointsService {
     }
 
     @Transactional
-    public void accrueToReferrers(Customer customer, float price) {
-        List<Referent> referrers = referentService.findReferrersByReferral(customer);
+    public void accrueToReferrers(long customerId, float price) {
+        List<Referent> referrers = referentService.findReferrersByReferralId(customerId);
         for(Referent referrer : referrers) {
             try {
                 accrueIfPresent(referrer.getReferrer().getId(), price, referrer.getLevel());
@@ -56,7 +56,7 @@ public class PointsService {
             float levelMultiple = optionService.findByName(level.name()).getValue();
             Customer foundCustomer = customerService.findById(id);
             int points = (int) (price / 100 * levelMultiple);
-            create(new Points(0, foundCustomer, LocalDateTime.now(), TransactionType.ACCRUED, points));
+            create(new Points(0, foundCustomer.getId(), LocalDateTime.now(), TransactionType.ACCRUED, points));
             customerService.accruePoints(foundCustomer, points);
         }
     }

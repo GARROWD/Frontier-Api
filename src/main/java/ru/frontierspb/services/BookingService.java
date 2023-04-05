@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.frontierspb.models.Booking;
-import ru.frontierspb.models.Customer;
 import ru.frontierspb.repositories.BookingRepository;
 import ru.frontierspb.util.enums.BookingStatus;
 import ru.frontierspb.util.exceptions.BookingAlreadyExistsException;
@@ -24,9 +23,9 @@ public class BookingService {
         придумать логику бронирования */
     private final BookingRepository bookingRepository;
 
-    public Booking findByCustomer(Customer customer)
+    public Booking findByCustomerId(long customerId)
             throws BookingNotFoundException {
-        Optional<Booking> foundBooking = bookingRepository.findByCustomerAndStatusIs(customer, BookingStatus.ACTIVE);
+        Optional<Booking> foundBooking = bookingRepository.findByCustomerIdAndStatusIs(customerId, BookingStatus.ACTIVE);
 
         if(foundBooking.isEmpty()) {
             throw new BookingNotFoundException();
@@ -37,16 +36,16 @@ public class BookingService {
 
     /* TODO Бронирование можно сделать с подтверждением, но надо ли? */
     @Transactional
-    public void create(Customer customer, Booking booking)
+    public void create(long customerId, Booking booking)
             throws BookingAlreadyExistsException {
         Map<String, String> errors = new HashMap<>();
 
-        if(bookingRepository.findByCustomerAndStatusIs(customer, BookingStatus.ACTIVE).isPresent()) {
+        if(bookingRepository.findByCustomerIdAndStatusIs(customerId, BookingStatus.ACTIVE).isPresent()) {
             errors.put("message.booking.alreadyExists", ExceptionsMessages.getMessage("message.booking.alreadyExists"));
             throw new BookingAlreadyExistsException(errors);
         }
 
-        booking.setCustomer(customer);
+        booking.setCustomerId(customerId);
         booking.setRequestDate(LocalDateTime.now());
         booking.setStatus(BookingStatus.ACTIVE);
         bookingRepository.save(booking);

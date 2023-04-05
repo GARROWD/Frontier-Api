@@ -10,13 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import ru.frontierspb.dto.requests.BookingRequest;
-import ru.frontierspb.dto.responses.BookingResponse;
-import ru.frontierspb.dto.responses.CustomerResponse;
-import ru.frontierspb.dto.responses.PointsResponse;
-import ru.frontierspb.dto.responses.SessionResponse;
+import ru.frontierspb.dto.responses.*;
 import ru.frontierspb.models.Booking;
 import ru.frontierspb.models.Customer;
-import ru.frontierspb.models.Referent;
 import ru.frontierspb.services.*;
 import ru.frontierspb.services.validators.CustomerValidationService;
 import ru.frontierspb.util.exceptions.*;
@@ -48,24 +44,26 @@ public class CustomerController {
     public List<SessionResponse> getSessions(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
-        return sessionService.findByCustomer(getCustomerFromContext(), PageRequest.of(page, size)).stream().map(
+        return sessionService.findByCustomer(getCustomerFromContext().getId(), PageRequest.of(page, size)).stream().map(
                 session -> modelMapper.map(session, SessionResponse.class)).toList();
     }
 
     @GetMapping("/referrals")
     @ResponseStatus(HttpStatus.OK)
-    public List<Referent> getReferrals(
+    public List<ReferralResponse> getReferrals(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
-        return referentService.findReferralsByReferrer(getCustomerFromContext(), PageRequest.of(page, size));
+        return referentService.findReferralsByReferrerId(getCustomerFromContext().getId(), PageRequest.of(page, size)).stream().map(
+                referent -> modelMapper.map(referent, ReferralResponse.class)).toList();
     }
 
     @GetMapping("/referrers")
     @ResponseStatus(HttpStatus.OK)
-    public List<Referent> getReferrers(
+    public List<ReferrerResponse> getReferrers(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
-        return referentService.findReferrersByReferral(getCustomerFromContext(), PageRequest.of(page, size));
+        return referentService.findReferrersByReferralId(getCustomerFromContext().getId(), PageRequest.of(page, size)).stream().map(
+                referent -> modelMapper.map(referent, ReferrerResponse.class)).toList();
     }
 
     @GetMapping("/points-history")
@@ -73,7 +71,7 @@ public class CustomerController {
     public List<PointsResponse> getPointsHistory(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
-        return pointsService.findByCustomer(getCustomerFromContext(), PageRequest.of(page, size)).stream().map(
+        return pointsService.findByCustomer(getCustomerFromContext().getId(), PageRequest.of(page, size)).stream().map(
                 points -> modelMapper.map(points, PointsResponse.class)).toList();
     }
 
@@ -81,7 +79,7 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public BookingResponse getBookingStatus()
             throws BookingNotFoundException {
-        return modelMapper.map(bookingService.findByCustomer(getCustomerFromContext()), BookingResponse.class);
+        return modelMapper.map(bookingService.findByCustomerId(getCustomerFromContext().getId()), BookingResponse.class);
     }
 
     @PutMapping("/username")
@@ -111,14 +109,14 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public void assignReferrer(@RequestParam String username)
             throws CustomerNotFoundException, CustomerReferentException {
-        referentService.assignReferrerById(getCustomerFromContext(), username);
+        referentService.assignReferrerById(getCustomerFromContext().getId(), username);
     }
 
     @PostMapping("/booking")
     @ResponseStatus(HttpStatus.OK)
     public void createBooking(@RequestBody BookingRequest bookingRequest)
             throws BookingAlreadyExistsException {
-        bookingService.create(getCustomerFromContext(), modelMapper.map(bookingRequest, Booking.class));
+        bookingService.create(getCustomerFromContext().getId(), modelMapper.map(bookingRequest, Booking.class));
     }
 
     /*

@@ -42,8 +42,8 @@ public class SessionService {
         return sessionsRepository.countAllByOutDateIsNull();
     }
 
-    public List<Session> findByCustomer(Customer customer, Pageable pageable) {
-        return sessionsRepository.findAllByCustomerOrderByInDateDesc(customer, pageable).toList();
+    public List<Session> findByCustomer(long customerId, Pageable pageable) {
+        return sessionsRepository.findAllByCustomerIdOrderByInDateDesc(customerId, pageable).toList();
     }
 
     /* TODO Я не могу понять, хорошо ли это, что тут методы явно дублируют друг друга.
@@ -59,14 +59,14 @@ public class SessionService {
 
         Customer customer = customerService.findById(id);
 
-        if(sessionsRepository.findByCustomerAndOutDateIsNull(customer).isPresent()) {
+        if(sessionsRepository.findByCustomerIdAndOutDateIsNull(id).isPresent()) {
             errors.put("message.session.alreadyCheckIn",
                        ExceptionsMessages.getMessage("message.session.alreadyCheckIn"));
             throw new SessionException(errors);
         }
 
         Session session = new Session();
-        session.setCustomer(customer);
+        session.setCustomerId(id);
         session.setCustomerUsername(customer.getUsername());
         session.setInDate(LocalDateTime.now());
         sessionsRepository.save(session);
@@ -81,7 +81,7 @@ public class SessionService {
 
         Customer customer = customerService.findById(id);
 
-        Optional<Session> activeSession = sessionsRepository.findByCustomerAndOutDateIsNull(customer);
+        Optional<Session> activeSession = sessionsRepository.findByCustomerIdAndOutDateIsNull(id);
 
         if(activeSession.isEmpty()) {
             errors.put("message.session.notCheckIn", ExceptionsMessages.getMessage("message.session.notCheckIn"));
@@ -95,7 +95,7 @@ public class SessionService {
         int pointsSpent = calculationService.calculatePointsSpent(price, points);
 
         customerService.deductPoints(customer, pointsSpent);
-        pointsService.accrueToReferrers(customer, price);
+        pointsService.accrueToReferrers(id, price);
 
         session.setPrice(price);
         session.setOutDate(outDate);
@@ -156,7 +156,7 @@ public class SessionService {
         int pointsSpent = calculationService.calculatePointsSpent(price, points);
 
         customerService.deductPoints(customer, points);
-        pointsService.accrueToReferrers(customer, price);
+        pointsService.accrueToReferrers(id, price);
 
         /*LocalDateTime inDate = LocalDateTime.now();
         LocalDateTime outDate;
@@ -169,7 +169,7 @@ public class SessionService {
         }*/
 
         Session session = new Session();
-        session.setCustomer(customer);
+        session.setCustomerId(customer.getId());
         session.setCustomerUsername(customer.getUsername());
         session.setInDate(LocalDateTime.now());
         session.setPrice(price);

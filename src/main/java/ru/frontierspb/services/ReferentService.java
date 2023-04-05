@@ -32,44 +32,49 @@ public class ReferentService {
         referentRepository.save(referrers);
     }
 
-    public List<Referent> findReferralsByReferrer(Customer customer, Pageable pageable) {
-        return referentRepository.findAllByReferrerOrderByLevel(customer, pageable).toList();
-    }
-    public List<Referent> findReferrersByReferral(Customer customer, Pageable pageable) {
-        return referentRepository.findAllByReferralOrderByLevel(customer, pageable).toList();
+    public List<Referent> findReferralsByReferrerId(long referrerId, Pageable pageable) {
+        return referentRepository.findAllByReferrerIdOrderByLevel(referrerId, pageable).toList();
     }
 
-    public List<Referent> findReferralsByReferrer(Customer customer) {
-        return referentRepository.findAllByReferrerOrderByLevel(customer);
+    public List<Referent> findReferrersByReferralId(long referralId, Pageable pageable) {
+        return referentRepository.findAllByReferralIdOrderByLevel(referralId, pageable).toList();
     }
 
-    public List<Referent> findReferrersByReferral(Customer customer) {
-        return referentRepository.findAllByReferralOrderByLevel(customer);
+    public List<Referent> findReferralsByReferrerId(long referrerId) {
+        return referentRepository.findAllByReferrerIdOrderByLevel(referrerId);
+    }
+
+    public List<Referent> findReferrersByReferralId(long referralId) {
+        return referentRepository.findAllByReferralIdOrderByLevel(referralId);
     }
 
     @Transactional
-    public void assignReferrerById(Customer customer, String referrerUsername)
+    public void assignReferrerById(long customerId, String referrerUsername)
             throws CustomerNotFoundException, CustomerReferentException {
         Map<String, String> errors = new HashMap<>();
 
-        Customer referral = customerService.findById(customer.getId());
+        /* customerService.existsById(customerId);
+        TODO Вот опять же я не понимаю, надо ли еще раз проверять на существование,
+         если до этого я взял customerId из контекста и он точно существует?
+        */
+        Customer referral = customerService.findById(customerId);
         Customer referrer = customerService.findByUsername(referrerUsername);
 
-        if(! findReferrersByReferral(referral).isEmpty()) {
+        if(! findReferrersByReferralId(customerId).isEmpty()) {
             errors.put("message.customer.alreadyHaveReferrer",
                        ExceptionsMessages.getMessage("message.customer.alreadyHaveReferrer"));
         }
 
-        if(Objects.equals(referral.getId(), referrer.getId())) {
+        if(Objects.equals(customerId, referrer.getId())) {
             errors.put("message.customer.referredYourself",
                        ExceptionsMessages.getMessage("message.customer.referredHimself"));
         }
 
-        if(!errors.isEmpty()){
+        if(! errors.isEmpty()) {
             throw new CustomerReferentException(errors);
         }
 
-        if(findReferralsByReferrer(referral).stream().anyMatch(
+        if(findReferralsByReferrerId(customerId).stream().anyMatch(
                 referent -> Objects.equals(referent.getReferral().getId(), referrer.getId()))) {
             errors.put("message.customer.referredReferral",
                        ExceptionsMessages.getMessage("message.customer.referredReferral"));
@@ -78,17 +83,18 @@ public class ReferentService {
 
         List<Referent> newReferrers =
                 Stream.concat(Stream.of(new Referent(0, referrer, referral, LEVEL_ONE)),
-                              findReferrersByReferral(referrer).stream().map(referent -> {
+                              findReferrersByReferralId(referrer.getId()).stream().map(referent -> {
                                   Referent newReferent = new Referent();
                                   newReferent.setReferrer(referent.getReferrer());
                                   newReferent.setReferral(referral);
                                   newReferent.setLevel(upgradeLevel(referent.getLevel()));
-                                  return newReferent;}))
+                                  return newReferent;
+                              }))
                       .collect(Collectors.toCollection(ArrayList::new));
 
         newReferrers.removeIf(referent -> referent.getLevel().equals(LEVEL_NULL));
         referentRepository.saveAll(newReferrers);
-        log.info("User with ID {} assigned referrer with username {}", referral.getId(), referrerUsername);
+        log.info("User with ID {} assigned referrer with username {}", customerId, referrerUsername);
     }
 
     private ReferentLevel upgradeLevel(ReferentLevel level) {
