@@ -38,11 +38,11 @@ public class PointsService {
     }
 
     @Transactional
-    public void accrueToReferrers(long customerId, float price) {
+    public void incrementToReferrers(long customerId, float price) {
         List<Referent> referrers = referentService.findReferrersByReferralId(customerId);
         for(Referent referrer : referrers) {
             try {
-                accrueIfPresent(referrer.getReferrer().getId(), price, referrer.getLevel());
+                incrementIfPresent(referrer.getReferrer().getId(), price, referrer.getLevel());
             } catch(CustomerNotFoundException | OptionNotFoundException exception) {
                 // TODO ОШИБКИ ОБРАБОТАЙ
                 log.warn("ЧЕЛ ХУЙНЯ ЧЕТ У ТЕБЯ");
@@ -50,14 +50,14 @@ public class PointsService {
         }
     }
 
-    private void accrueIfPresent(long id, float price, ReferentLevel level)
+    private void incrementIfPresent(long id, float price, ReferentLevel level)
             throws CustomerNotFoundException, OptionNotFoundException {
         if(! Objects.equals(id, 0)) {
             float levelMultiple = optionService.findByName(level.name()).getValue();
             Customer foundCustomer = customerService.findById(id);
             int points = (int) (price / 100 * levelMultiple);
             create(new Points(0, foundCustomer.getId(), LocalDateTime.now(), TransactionType.ACCRUED, points));
-            customerService.accruePoints(foundCustomer, points);
+            customerService.incrementPoints(foundCustomer, points);
         }
     }
 }

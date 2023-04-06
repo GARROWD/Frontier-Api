@@ -39,11 +39,11 @@ public class Customer {
     @Column(name = "role", nullable = false)
     private String role;
 
-    public void accruePoints(int points){
+    public void incrementPoints(int points){
         this.points += points;
     }
 
-    public void deductPoints(int points){
+    public void decrementPoints(int points){
         this.points -= points;
     }
 }

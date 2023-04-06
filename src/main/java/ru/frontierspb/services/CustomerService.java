@@ -132,20 +132,20 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deductPoints(Customer customer, int points)
+    public void decrementPoints(Customer customer, int points)
             throws PointsInsufficientException {
         if(customer.getPoints() < points) {
             throw new PointsInsufficientException(Map.of("message.points.insufficient",
                                                          ExceptionsMessages.getMessage("message.points.insufficient")));
         }
 
-        customer.deductPoints(points);
+        customer.decrementPoints(points);
         updateWithoutChecks(customer);
     }
 
     @Transactional
-    public void accruePoints(Customer customer, int points) {
-        customer.accruePoints(points);
+    public void incrementPoints(Customer customer, int points) {
+        customer.incrementPoints(points);
         updateWithoutChecks(customer);
     }
 

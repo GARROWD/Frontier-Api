@@ -88,8 +88,8 @@ public class SessionService {
         float price = calculationService.calculatePrice(session.getInDate(), outDate);
         int pointsSpent = calculationService.calculatePointsSpent(price, points);
 
-        customerService.deductPoints(customer, pointsSpent);
-        pointsService.accrueToReferrers(id, price);
+        customerService.decrementPoints(customer, pointsSpent);
+        pointsService.incrementToReferrers(id, price);
 
         session.setPrice(price);
         session.setOutDate(outDate);
@@ -144,8 +144,8 @@ public class SessionService {
         float price = calculationService.calculatePrice(extras);
         int pointsSpent = calculationService.calculatePointsSpent(price, points);
 
-        customerService.deductPoints(customer, points);
-        pointsService.accrueToReferrers(id, price);
+        customerService.decrementPoints(customer, points);
+        pointsService.incrementToReferrers(id, price);
 
         /*LocalDateTime inDate = LocalDateTime.now();
         LocalDateTime outDate;
