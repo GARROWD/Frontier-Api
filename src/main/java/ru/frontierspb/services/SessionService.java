@@ -16,7 +16,6 @@ import ru.frontierspb.util.exceptions.SessionException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,14 +54,11 @@ public class SessionService {
     @Transactional
     public Session checkInById(long id)
             throws SessionException, CustomerNotFoundException {
-        Map<String, String> errors = new HashMap<>();
-
         Customer customer = customerService.findById(id);
 
         if(sessionsRepository.findByCustomerIdAndOutDateIsNull(id).isPresent()) {
-            errors.put("message.session.alreadyCheckIn",
-                       ExceptionsMessages.getMessage("message.session.alreadyCheckIn"));
-            throw new SessionException(errors);
+            throw new SessionException(Map.of("message.session.alreadyCheckIn",
+                                              ExceptionsMessages.getMessage("message.session.alreadyCheckIn")));
         }
 
         Session session = new Session();
@@ -77,15 +73,13 @@ public class SessionService {
     @Transactional
     public Session checkOutById(long id, int points)
             throws CustomerNotFoundException, SessionException, OptionNotFoundException, PointsInsufficientException {
-        Map<String, String> errors = new HashMap<>();
-
         Customer customer = customerService.findById(id);
 
         Optional<Session> activeSession = sessionsRepository.findByCustomerIdAndOutDateIsNull(id);
 
         if(activeSession.isEmpty()) {
-            errors.put("message.session.notCheckIn", ExceptionsMessages.getMessage("message.session.notCheckIn"));
-            throw new SessionException(errors);
+            throw new SessionException(
+                    Map.of("message.session.notCheckIn", ExceptionsMessages.getMessage("message.session.notCheckIn")));
         }
 
         Session session = activeSession.get();
@@ -108,12 +102,9 @@ public class SessionService {
     @Transactional
     public Session checkInByGuestUsername(String username)
             throws SessionException {
-        Map<String, String> errors = new HashMap<>();
-
         if(sessionsRepository.findByCustomerUsernameAndOutDateIsNull(username).isPresent()) {
-            errors.put("message.session.alreadyCheckIn",
-                       ExceptionsMessages.getMessage("message.session.alreadyCheckIn"));
-            throw new SessionException(errors);
+            throw new SessionException(Map.of("message.session.alreadyCheckIn",
+                                              ExceptionsMessages.getMessage("message.session.alreadyCheckIn")));
         }
 
         Session session = new Session();
@@ -127,13 +118,11 @@ public class SessionService {
     @Transactional
     public Session checkOutByGuestUsername(String username)
             throws SessionException, OptionNotFoundException {
-        Map<String, String> errors = new HashMap<>();
-
         Optional<Session> activeSession = sessionsRepository.findByCustomerUsernameAndOutDateIsNull(username);
 
         if(activeSession.isEmpty()) {
-            errors.put("message.session.notCheckIn", ExceptionsMessages.getMessage("message.session.notCheckIn"));
-            throw new SessionException(errors);
+            throw new SessionException(
+                    Map.of("message.session.notCheckIn", ExceptionsMessages.getMessage("message.session.notCheckIn")));
         }
 
         Session session = activeSession.get();

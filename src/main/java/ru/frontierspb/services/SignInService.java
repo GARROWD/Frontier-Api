@@ -20,8 +20,7 @@ public class SignInService {
             throws CustomerNotFoundException {
         Customer customer = customerService.findByUsernameAndPassword(username, passwordEncoder.encode(password));
 
-        return new UsernamePasswordAuthenticationToken(
-                customerService.findByUsername(customer.getUsername()), null,
+        return new UsernamePasswordAuthenticationToken(customer, null,
                 Collections.singleton(new SimpleGrantedAuthority(customer.getRole())));
     }
 }

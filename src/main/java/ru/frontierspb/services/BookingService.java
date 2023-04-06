@@ -11,7 +11,6 @@ import ru.frontierspb.util.exceptions.BookingNotFoundException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,7 +24,8 @@ public class BookingService {
 
     public Booking findByCustomerId(long customerId)
             throws BookingNotFoundException {
-        Optional<Booking> foundBooking = bookingRepository.findByCustomerIdAndStatusIs(customerId, BookingStatus.ACTIVE);
+        Optional<Booking> foundBooking = bookingRepository.findByCustomerIdAndStatusIs(customerId,
+                                                                                       BookingStatus.ACTIVE);
 
         if(foundBooking.isEmpty()) {
             throw new BookingNotFoundException();
@@ -38,11 +38,11 @@ public class BookingService {
     @Transactional
     public void create(long customerId, Booking booking)
             throws BookingAlreadyExistsException {
-        Map<String, String> errors = new HashMap<>();
-
         if(bookingRepository.findByCustomerIdAndStatusIs(customerId, BookingStatus.ACTIVE).isPresent()) {
-            errors.put("message.booking.alreadyExists", ExceptionsMessages.getMessage("message.booking.alreadyExists"));
-            throw new BookingAlreadyExistsException(errors);
+            throw new BookingAlreadyExistsException(
+                    Map.of("message.booking.alreadyExists",
+                           ExceptionsMessages.getMessage("message.booking.alreadyExists"))
+            );
         }
 
         booking.setCustomerId(customerId);

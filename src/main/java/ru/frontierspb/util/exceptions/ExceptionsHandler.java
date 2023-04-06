@@ -2,13 +2,30 @@ package ru.frontierspb.util.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.frontierspb.util.messages.ExceptionsMessages;
+
 import java.util.Map;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
-    // А как сделать так, чтобы я возвращал класс message без названия полей? Пока только так @JsonUnwrapped
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, String>> httpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException exception) {
+        return new ResponseEntity<>(Map.of("message.request.methodNotSupported", ExceptionsMessages.getMessage(
+                "message.request.methodNotSupported") + " - " + exception.getMethod()), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, String>> missingServletRequestParameterException(
+            MissingServletRequestParameterException exception) {
+        return new ResponseEntity<>(Map.of("message.request.missingParameter", ExceptionsMessages.getMessage(
+                "message.request.missingParameter") + " - " + exception.getParameterName()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BookingAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> bookingAlreadyExistsException(
             BookingAlreadyExistsException exception) {
@@ -18,12 +35,6 @@ public class ExceptionsHandler {
     @ExceptionHandler(CustomerReferentException.class)
     public ResponseEntity<Map<String, String>> customerAlreadyHaveReferrerException(
             CustomerReferentException exception) {
-        return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> illegalArgumentException(
-            IllegalArgumentException exception) {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 
@@ -51,7 +62,8 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> customerAlreadyExistsException(CustomerAlreadyExistsException exception) {
+    public ResponseEntity<Map<String, String>> customerAlreadyExistsException(
+            CustomerAlreadyExistsException exception) {
         return new ResponseEntity<>(exception.getMessages(), HttpStatus.BAD_REQUEST);
     }
 
@@ -77,7 +89,7 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<Map<String, String>> customerNotFoundException() {
+    public ResponseEntity<Map<String, String>> customerNotFoundException(CustomerNotFoundException exception) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

@@ -12,7 +12,6 @@ import ru.frontierspb.util.exceptions.PreviousPasswordsException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +33,17 @@ public class PreviousPasswordsService {
     @Transactional
     public void checkUniqueToUpdate(Customer customer, String password)
             throws PreviousPasswordsException {
-        Map<String, String> errors = new HashMap<>();
-
-        if(customer.getPassword().equals(password)){
-            errors.put("message.password.same", ExceptionsMessages.getMessage("message.password.same"));
-            throw new PreviousPasswordsException(errors);
+        if(customer.getPassword().equals(password)) {
+            throw new PreviousPasswordsException(
+                    Map.of("message.password.same", ExceptionsMessages.getMessage("message.password.same")));
         }
 
         List<PreviousPassword> previousPasswords = findByCustomer(customer.getId());
 
         if(previousPasswords.stream().anyMatch(
                 previousPassword -> previousPassword.getPassword().equals(password))) {
-            errors.put("message.password.notUnique", ExceptionsMessages.getMessage("message.password.notUnique"));
-            throw new PreviousPasswordsException(errors);
+            throw new PreviousPasswordsException(
+                    Map.of("message.password.notUnique", ExceptionsMessages.getMessage("message.password.notUnique")));
         }
 
         create(customer);

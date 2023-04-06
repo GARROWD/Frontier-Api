@@ -19,7 +19,7 @@ public class OptionController {
     private final OptionService optionService;
     private final OptionValidationService optionValidationService;
 
-    @PutMapping("/update")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void update(@RequestBody OptionRequest optionRequest)
             throws OptionNotFoundException, OptionValidationException {

@@ -17,13 +17,13 @@ import ru.frontierspb.util.exceptions.SessionException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/session")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class SessionController {
     private final ModelMapper modelMapper;
     private final SessionService sessionService;
 
-    @GetMapping("/all")
+    @GetMapping("/sessions")
     public List<CustomerSessionResponse> findAll(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
@@ -31,7 +31,9 @@ public class SessionController {
                 session -> modelMapper.map(session, CustomerSessionResponse.class)).toList();
     }
 
-    @GetMapping("/all-active")
+    // TODO Может методы сверху и снизу тоже обьеденить...?
+
+    @GetMapping("/sessions/active")
     public List<CustomerSessionResponse> findAllActive(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
@@ -53,14 +55,14 @@ public class SessionController {
         return modelMapper.map(sessionService.checkOutById(id, points), CustomerCheckOutResponse.class);
     }
 
-    @PostMapping("/check-in-guest")
-    public CustomerCheckInResponse checkInByUsername(@RequestParam(name = "username") String username)
+    @PostMapping("/check-in/guest")
+    public CustomerCheckInResponse checkInByGuestUsername(@RequestParam(name = "username") String username)
             throws SessionException {
         return modelMapper.map(sessionService.checkInByGuestUsername(username), CustomerCheckInResponse.class);
     }
 
-    @PostMapping("/check-out-guest")
-    public CustomerCheckOutResponse checkOutByUsername(@RequestParam(name = "username") String username)
+    @PostMapping("/check-out/guest")
+    public CustomerCheckOutResponse checkOutByGuestUsername(@RequestParam(name = "username") String username)
             throws SessionException, OptionNotFoundException {
         return modelMapper.map(sessionService.checkOutByGuestUsername(username), CustomerCheckOutResponse.class);
     }
@@ -74,8 +76,8 @@ public class SessionController {
         return modelMapper.map(sessionService.checkNightStayById(id, points, extras), CustomerSessionResponse.class);
     }
 
-    @PostMapping("/check-night-stay-guest")
-    public CustomerSessionResponse checkNightStayByUsername(
+    @PostMapping("/check-night-stay/guest")
+    public CustomerSessionResponse checkNightStayByGuestUsername(
             @RequestParam(name = "username") String username,
             @RequestParam(name = "extras", defaultValue = Extras.DEFAULT_VALUE) Extras extras)
             throws OptionNotFoundException {

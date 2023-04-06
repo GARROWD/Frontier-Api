@@ -6,7 +6,6 @@ import ru.frontierspb.dto.requests.OptionRequest;
 import ru.frontierspb.util.exceptions.OptionValidationException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,11 +14,8 @@ import java.util.Optional;
 public class OptionValidationService {
     public void validateOptionRequest(OptionRequest optionRequest)
             throws OptionValidationException {
-        Map<String, String> errors = new HashMap<>();
-
         if(optionRequestFieldsIsNull(optionRequest)) {
-            errors.put("message.option.nullFields", ExceptionsMessages.getMessage("message.option.nullFields"));
-            throw new OptionValidationException(errors);
+            throw new OptionValidationException(Map.of("message.option.nullFields", ExceptionsMessages.getMessage("message.option.nullFields")));
         }
     }
 

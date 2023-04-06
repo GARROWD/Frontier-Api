@@ -53,10 +53,6 @@ public class ReferentService {
             throws CustomerNotFoundException, CustomerReferentException {
         Map<String, String> errors = new HashMap<>();
 
-        /* customerService.existsById(customerId);
-        TODO Вот опять же я не понимаю, надо ли еще раз проверять на существование,
-         если до этого я взял customerId из контекста и он точно существует?
-        */
         Customer referral = customerService.findById(customerId);
         Customer referrer = customerService.findByUsername(referrerUsername);
 

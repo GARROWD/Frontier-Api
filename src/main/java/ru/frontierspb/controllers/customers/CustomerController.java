@@ -1,21 +1,15 @@
 package ru.frontierspb.controllers.customers;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
-import ru.frontierspb.dto.requests.BookingRequest;
 import ru.frontierspb.dto.responses.*;
-import ru.frontierspb.models.Booking;
 import ru.frontierspb.models.Customer;
 import ru.frontierspb.services.*;
-import ru.frontierspb.services.validators.CustomerValidationService;
-import ru.frontierspb.util.exceptions.*;
+import ru.frontierspb.util.exceptions.CustomerNotFoundException;
 
 import java.util.List;
 
@@ -29,8 +23,6 @@ public class CustomerController {
     private final BookingService bookingService;
     private final CustomerService customerService;
     private final ReferentService referentService;
-    private final PreviousPasswordsService previousPasswordsService;
-    private final CustomerValidationService customerValidationService;
 
     @GetMapping("/info")
     @ResponseStatus(HttpStatus.OK)
@@ -75,70 +67,12 @@ public class CustomerController {
                 points -> modelMapper.map(points, PointsResponse.class)).toList();
     }
 
-    @GetMapping("/booking-status")
+    /*@GetMapping("/booking-status")
     @ResponseStatus(HttpStatus.OK)
     public BookingResponse getBookingStatus()
             throws BookingNotFoundException {
         return modelMapper.map(bookingService.findByCustomerId(getCustomerFromContext().getId()), BookingResponse.class);
-    }
-
-    @PutMapping("/username")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateUsername(@RequestParam String username)
-            throws CustomerValidationException, CustomerAlreadyExistsException, CustomerNotFoundException {
-        Customer customer = customerService.findById(getCustomerFromContext().getId());
-        customer.setUsername(username);
-        customerValidationService.validateCustomer(customer);
-        customerService.checkUniqueToUpdate(customer);
-        customerService.update(customer);
-    }
-
-    @PutMapping("/password")
-    @ResponseStatus(HttpStatus.OK)
-    public void updatePassword(@RequestParam String password)
-            throws CustomerValidationException, CustomerNotFoundException,
-            PreviousPasswordsException {
-        Customer customer = customerService.findById(getCustomerFromContext().getId());
-        previousPasswordsService.checkUniqueToUpdate(customer, password);
-        customer.setPassword(password);
-        customerValidationService.validateCustomer(customer);
-        customerService.update(customer);
-    }
-
-    @PutMapping("/assign-referrer")
-    @ResponseStatus(HttpStatus.OK)
-    public void assignReferrer(@RequestParam String username)
-            throws CustomerNotFoundException, CustomerReferentException {
-        referentService.assignReferrerById(getCustomerFromContext().getId(), username);
-    }
-
-    @PostMapping("/booking")
-    @ResponseStatus(HttpStatus.OK)
-    public void createBooking(@RequestBody BookingRequest bookingRequest)
-            throws BookingAlreadyExistsException {
-        bookingService.create(getCustomerFromContext().getId(), modelMapper.map(bookingRequest, Booking.class));
-    }
-
-    /*
-    @PutMapping("/edit")
-    @ResponseStatus(HttpStatus.OK)
-    private void editPhoneNumber(@RequestParam String phoneNumber)
-            throws CustomerValidationException, CustomerAlreadyExistsException {
-        Customer customer = getCustomerFromContext();
-        customer.setPhoneNumber(phoneNumber);
-        customersValidationService.validateCustomer(customer);
-        customersService.saveAndCheckUnique(customer);
-    }
-    */
-
-    @DeleteMapping("/delete")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete(HttpServletRequest request, HttpServletResponse response)
-            throws CustomerNotFoundException {
-        customerService.delete(getCustomerFromContext().getId());
-        new SecurityContextLogoutHandler().logout(request, response,
-                                                  SecurityContextHolder.getContext().getAuthentication());
-    }
+    }*/
 
     private Customer getCustomerFromContext() {
         return (Customer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

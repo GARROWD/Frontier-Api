@@ -134,11 +134,9 @@ public class CustomerService {
     @Transactional
     public void deductPoints(Customer customer, int points)
             throws PointsInsufficientException {
-        Map<String, String> errors = new HashMap<>();
-
         if(customer.getPoints() < points) {
-            errors.put("message.points.insufficient", ExceptionsMessages.getMessage("message.points.insufficient"));
-            throw new PointsInsufficientException(errors);
+            throw new PointsInsufficientException(Map.of("message.points.insufficient",
+                                                         ExceptionsMessages.getMessage("message.points.insufficient")));
         }
 
         customer.deductPoints(points);

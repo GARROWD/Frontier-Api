@@ -8,7 +8,7 @@ import ru.frontierspb.models.Customer;
 import ru.frontierspb.util.exceptions.AdminAlreadyExistsException;
 import ru.frontierspb.util.exceptions.CustomerNotFoundException;
 import ru.frontierspb.util.messages.ExceptionsMessages;
-import java.util.HashMap;
+
 import java.util.Map;
 
 @Service
@@ -21,13 +21,10 @@ public class AdminService {
     @Transactional
     public void assignAdmin(long id)
             throws CustomerNotFoundException, AdminAlreadyExistsException {
-        Map<String, String> errors = new HashMap<>();
-
         Customer customer = customerService.findById(id);
 
         if(customer.getRole().equals("ROLE_ADMIN")) {
-            errors.put("message.customer.alreadyAdmin", ExceptionsMessages.getMessage("message.customer.alreadyAdmin"));
-            throw new AdminAlreadyExistsException(errors);
+            throw new AdminAlreadyExistsException(Map.of("message.customer.alreadyAdmin", ExceptionsMessages.getMessage("message.customer.alreadyAdmin")));
         }
 
         customer.setRole("ROLE_ADMIN");
