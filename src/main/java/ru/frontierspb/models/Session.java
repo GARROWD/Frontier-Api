@@ -32,6 +32,6 @@ public class Session {
     @Column(name = "price")
     private float price;
 
-    @Column(name = "points_spent")
+    @Column(name = "points")
     private int pointsSpent;
 }

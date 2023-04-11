@@ -40,7 +40,7 @@ public class CustomerEditController {
             customerService.checkUniqueToUpdate(customer);
             customerService.update(customer);
         }
-        else if (! password.isBlank()){
+        if (! password.isBlank()){
             previousPasswordsService.checkUniqueToUpdate(customer, password);
             customer.setPassword(password);
             customerValidationService.validateCustomer(customer);

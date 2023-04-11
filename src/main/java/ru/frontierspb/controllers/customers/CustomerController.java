@@ -58,9 +58,9 @@ public class CustomerController {
                 referent -> modelMapper.map(referent, ReferrerResponse.class)).toList();
     }
 
-    @GetMapping("/points-history")
+    @GetMapping("/points")
     @ResponseStatus(HttpStatus.OK)
-    public List<PointsResponse> getPointsHistory(
+    public List<PointsResponse> getPoints(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size) {
         return pointsService.findByCustomer(getCustomerFromContext().getId(), PageRequest.of(page, size)).stream().map(
